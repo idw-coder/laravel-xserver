@@ -8,6 +8,7 @@
                     <th class="border px-4 py-2">ID</th>
                     <th class="border px-4 py-2">名前</th>
                     <th class="border px-4 py-2">メール</th>
+                    <th class="border px-4 py-2">パスワード</th>
                     <th class="border px-4 py-2">登録日</th>
                 </tr>
             </thead>
@@ -17,6 +18,7 @@
                     <td class="border px-4 py-2">{{ $user->id }}</td>
                     <td class="border px-4 py-2">{{ $user->name }}</td>
                     <td class="border px-4 py-2">{{ $user->email }}</td>
+                    <td class="border px-4 py-2">{{ $user->password }}</td>
                     <td class="border px-4 py-2">{{ $user->created_at->format('Y-m-d') }}</td>
                 </tr>
                 @endforeach

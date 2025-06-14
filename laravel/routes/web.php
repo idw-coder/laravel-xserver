@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     // プロフィールの削除
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // ユーザー一覧ページの表示
-    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users', [UserController::class, 'index'])->name('users');
 });
 
 // 認証関連のルートを読み込み
