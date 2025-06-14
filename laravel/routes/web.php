@@ -9,7 +9,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// ダッシュボードページのルート（認証済みユーザーのみアクセス可能）
+// ダッシュボードページのルート
+// middleware(['auth']) - ログインしていないユーザーはアクセス不可（未ログイン時は自動的にログインページにリダイレクト）
+// middleware(['verified']) - メール認証が完了していないユーザーはアクセス不可（未認証時は認証ページにリダイレクト）
+// 認証関連のルート定義は routes/auth.php を参照
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
