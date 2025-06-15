@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
+use App\Enums\PostStatus;
 
 /**
  * 投稿モデル
@@ -38,7 +39,7 @@ class Post extends Model
      */
     protected $casts = [
         'published_at' => 'datetime',
-        'status' => 'string',
+        'status' => PostStatus::class,
     ];
 
     /**
