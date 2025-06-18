@@ -33,7 +33,13 @@ class PostController extends Controller
     {
         // ページネーション付きで投稿一覧を取得
         $posts = Post::with('author')  // 作者情報も一緒に取得（Eager Loading）
-            ->where('status', PostStatus::PUBLISHED)  // 公開済みのみ
+            ->where(function ($query) {
+                $query->where('status', PostStatus::PUBLISHED)  // 公開済み
+                    ->orWhere(function ($q) {
+                        $q->where('status', PostStatus::DRAFT)  // 下書き
+                            ->where('user_id', Auth::user()->id);  // 自分の投稿のみ
+                    });
+            })
             ->orderBy('published_at', 'desc')  // 公開日時の降順（新しい順）
             ->paginate(10);  // 10件ずつページ分割（LengthAwarePaginatorを返す）
 
@@ -80,12 +86,9 @@ class PostController extends Controller
         ]);
 
         // タイトルからスラッグを自動生成
-        // Str::slug() はタイトルをURL用文字列に変換
-        // 例：「私の投稿」→ 「watashi-no-toukou」（日本語の場合は空になることが多い）
         $slug = Str::slug($validated['title']) ?: Str::random(10);
 
         // 同じスラッグが既に存在する場合は番号を付加して重複を回避
-        // 例：my-post, my-post-1, my-post-2...
         $originalSlug = $slug;
         $counter = 1;
         while (Post::where('slug', $slug)->exists()) {
@@ -95,7 +98,7 @@ class PostController extends Controller
 
         // データベースに保存するデータを配列で準備
         $postData = [
-            'user_id' => Auth::id(),  // 現在ログイン中のユーザーID
+            'user_id' => Auth::user()->id,  // 現在ログイン中のユーザーID
             'title' => $validated['title'],
             'slug' => $slug,
             'excerpt' => $validated['excerpt'],
@@ -104,18 +107,12 @@ class PostController extends Controller
         ];
 
         // 公開ステータスの場合は公開日時を現在時刻に設定
-        // 下書きの場合は published_at は null のまま
         if ($validated['status'] === 'published') {
-            $postData['published_at'] = now();  // 現在の日時
+            $postData['published_at'] = now();
         }
 
-        // データベースに新しい投稿を作成
-        // create() は $fillable で指定した属性のみ保存（マスアサインメント保護）
         Post::create($postData);
 
-        // 投稿一覧ページにリダイレクトし、成功メッセージをセッションに保存
-        // with() でセッションにフラッシュメッセージを設定
-        // フラッシュメッセージは一度表示されると自動的に削除される
         return redirect()->route('posts.index')
             ->with('success', '投稿が正常に作成されました。');
     }
@@ -141,13 +138,12 @@ class PostController extends Controller
         // 下書き投稿は作成者のみ閲覧可能
         if (
             $post->status !== PostStatus::PUBLISHED &&
-            (!Auth::check() || Auth::id() !== $post->user_id)
+            (!Auth::check() || Auth::user()->id !== $post->user_id)
         ) {
             abort(404);  // 404 Not Found エラーを発生
         }
 
         // 投稿の作者情報も一緒に読み込む
-        // ルートモデルバインディングでは with() が適用されないため、手動で読み込み
         $post->load('author');
 
         return view('posts.show', compact('post'));
@@ -163,17 +159,15 @@ class PostController extends Controller
      * 
      * 現在はコメントアウト中（未実装）
      */
-    /*
     public function edit(Post $post)
     {
         // 投稿の作成者以外はアクセス拒否
-        if (auth()->id() !== $post->user_id) {
+        if (Auth::user()->id !== $post->user_id) {
             abort(403);  // 403 Forbidden エラーを発生
         }
 
         return view('posts.edit', compact('post'));
     }
-    */
 
     /**
      * 投稿更新処理
@@ -185,11 +179,10 @@ class PostController extends Controller
      * 
      * 現在はコメントアウト中（未実装）
      */
-    /*
     public function update(Request $request, Post $post)
     {
         // 投稿の作成者以外は更新拒否
-        if (auth()->id() !== $post->user_id) {
+        if (Auth::user()->id !== $post->user_id) {
             abort(403);
         }
 
@@ -210,10 +203,9 @@ class PostController extends Controller
         $post->update($validated);
 
         // 詳細ページにリダイレクト
-        return redirect()->route('posts.show', $post)
+        return redirect()->route('posts.show', $post->slug)
             ->with('success', '投稿を更新しました');
     }
-    */
 
     /**
      * 投稿削除処理
@@ -227,11 +219,10 @@ class PostController extends Controller
      * 
      * 現在はコメントアウト中（未実装）
      */
-    /*
     public function destroy(Post $post)
     {
         // 投稿の作成者以外は削除拒否
-        if (auth()->id() !== $post->user_id) {
+        if (Auth::user()->id !== $post->user_id) {
             abort(403);
         }
 
@@ -242,5 +233,4 @@ class PostController extends Controller
         return redirect()->route('posts.index')
             ->with('success', '投稿を削除しました');
     }
-    */
 }

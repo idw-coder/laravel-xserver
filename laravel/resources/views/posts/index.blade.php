@@ -63,7 +63,11 @@
                                                 - format() は Carbon（日時ライブラリ）のメソッド
                                                 - Y年n月j日 = 2025年1月1日 形式
                                             --}}
+                                    @if($post->status === App\Enums\PostStatus::DRAFT)
+                                    <span class="text-yellow-600">下書き</span>
+                                    @else
                                     {{ $post->published_at ? $post->published_at->format('Y年n月j日') : '未公開' }}
+                                    @endif
                                 </span>
                             </div>
 
@@ -98,7 +102,11 @@
                                             - PostStatus Enum で定義したカスタムメソッド
                                             - 'published' → '公開' のように日本語で表示
                                         --}}
-                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                                <span class="px-2 py-1 text-xs rounded-full
+                                    @if($post->status === App\Enums\PostStatus::PUBLISHED) bg-green-100 text-green-800
+                                    @elseif($post->status === App\Enums\PostStatus::DRAFT) bg-yellow-100 text-yellow-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
                                     {{ $post->status->label() }}
                                 </span>
                             </div>

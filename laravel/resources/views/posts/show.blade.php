@@ -1,10 +1,3 @@
-{{--
-    投稿詳細ページ
-    - 投稿の全内容を表示
-    - 作成者情報と公開日時を表示
-    - 作成者には編集・削除ボタンを表示（今後実装予定）
---}}
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -22,19 +15,23 @@
 
             {{-- 作成者のみに表示される管理ボタン --}}
             @auth
-            @if(auth()->id() === $post->user_id)
+            @if(Auth::user()->id === $post->user_id)
             <div class="flex space-x-2">
-                {{-- 編集ボタン（今後実装予定） --}}
-                <a href="#"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors opacity-50 cursor-not-allowed"
-                    title="編集機能は準備中です">
+                {{-- 編集ボタン --}}
+                <a href="{{ route('posts.edit', $post->slug) }}"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                     編集
                 </a>
-                {{-- 削除ボタン（今後実装予定） --}}
-                <button class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors opacity-50 cursor-not-allowed"
-                    title="削除機能は準備中です">
-                    削除
-                </button>
+                {{-- 削除ボタン --}}
+                <form method="POST" action="{{ route('posts.destroy', $post->slug) }}"
+                    onsubmit="return confirm('本当に削除しますか？')" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                        削除
+                    </button>
+                </form>
             </div>
             @endif
             @endauth
@@ -43,15 +40,15 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            {{-- 成功メッセージ表示（編集・削除後に使用予定） --}}
+            {{-- 成功メッセージ表示 --}}
             @if(session('success'))
             <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
                 {{ session('success') }}
             </div>
             @endif
 
-            <div class="px-4 py-2 bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <article class="p-8">
+            <div class="p-10 bg-white shadow-sm sm:rounded-lg">
+                <article class="">
                     {{-- 投稿ヘッダー --}}
                     <header class="mb-8">
                         {{-- タイトル --}}
