@@ -1,5 +1,8 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import fs from 'fs-extra';
+
+fs.copySync('node_modules/tinymce', 'public/js/tinymce');
 
 export default defineConfig({
     plugins: [
