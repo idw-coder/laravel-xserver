@@ -67,14 +67,15 @@
                                 height: 300,
                                 base_url: "{{ asset('js/tinymce') }}",
                                 language: 'ja',
-                                language_url: '/js/tinymce/ja/langs/ja.js',
+                                language_url: "{{ asset('js/tinymce/ja/langs/ja.js') }}",
                                 automatic_uploads: true,
                                 images_upload_handler: (blobInfo, progress) => {
                                     return new Promise((resolve, reject) => {
                                         const formData = new FormData();
                                         formData.append('file', blobInfo.blob(), blobInfo.filename());
 
-                                        fetch('/upload-image', {
+                                        const UPLOAD_IMAGE_URL = "{{ url('upload-image') }}";
+                                        fetch(UPLOAD_IMAGE_URL, {
                                                 method: 'POST',
                                                 headers: {
                                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'

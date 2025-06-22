@@ -37,7 +37,12 @@ class ImageUploadController extends Controller
         $extension = $file->getClientOriginalExtension();
         $filename = time() . '_' . uniqid() . '.' . $extension;
 
-        $uploadPath = public_path('uploads');
+        if (app()->environment('production')) {
+            $uploadPath = base_path('uploads');
+        } else {
+            // ローカルは変更なしでOK
+            $uploadPath = public_path('uploads');
+        }
 
         Log::info('保存先ディレクトリ', ['path' => $uploadPath]);
         Log::info('生成されたファイル名', ['filename' => $filename]);
@@ -51,7 +56,12 @@ class ImageUploadController extends Controller
         $file->move($uploadPath, $filename);
 
         $fullPath = $uploadPath . '/' . $filename;
-        $url = url('uploads/' . $filename);
+
+        if (app()->environment('production')) {
+            $url = url('uploads/' . $filename);
+        } else {
+            $url = url('uploads/' . $filename);
+        }
 
         Log::info('保存されたパス', ['fullPath' => $fullPath]);
         Log::info('アクセスURL', ['url' => $url]);
