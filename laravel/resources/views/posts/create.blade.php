@@ -65,7 +65,39 @@
                                 plugins: 'link image code lists',
                                 toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',
                                 height: 300,
-                                base_url: "{{ asset('js/tinymce') }}" // 重要: TinyMCE内部パス解決用
+                                base_url: "{{ asset('js/tinymce') }}",
+                                language: 'ja',
+                                language_url: '/js/tinymce/ja/langs/ja.js',
+                                automatic_uploads: true,
+                                images_upload_handler: (blobInfo, progress) => {
+                                    return new Promise((resolve, reject) => {
+                                        const formData = new FormData();
+                                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                                        fetch('/upload-image', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: formData,
+                                            })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                console.log('Upload result:', json);
+                                                if (json.location && typeof json.location === 'string') {
+                                                    console.log('アップロード成功:', json.location);
+                                                    resolve(json.location); // Promise.resolve で URL を返す
+                                                } else {
+                                                    console.error('Invalid response:', json);
+                                                    reject('Invalid response: no location');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.error('Upload error:', err);
+                                                reject('Upload failed: ' + err);
+                                            });
+                                    });
+                                }
                             });
                         </script>
 
