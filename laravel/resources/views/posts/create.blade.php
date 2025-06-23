@@ -50,13 +50,57 @@
                             </label>
                             <textarea id="body"
                                 name="body"
-                                rows="15"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('body') border-red-500 @enderror"
-                                placeholder="投稿の本文を入力してください">{{ old('body') }}</textarea>
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('body') border-red-500 @enderror">{{ old('body') }}</textarea>
                             @error('body')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <!-- TinyMCE -->
+                        <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+                        <script>
+                            tinymce.init({
+                                selector: '#body',
+                                menubar: false,
+                                plugins: 'link image code lists',
+                                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',
+                                height: 300,
+                                base_url: "{{ asset('js/tinymce') }}",
+                                language: 'ja',
+                                language_url: "{{ asset('js/tinymce/ja/langs/ja.js') }}",
+                                automatic_uploads: true,
+                                images_upload_handler: (blobInfo, progress) => {
+                                    return new Promise((resolve, reject) => {
+                                        const formData = new FormData();
+                                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                                        const UPLOAD_IMAGE_URL = "{{ url('upload-image') }}";
+                                        fetch(UPLOAD_IMAGE_URL, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: formData,
+                                            })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                console.log('Upload result:', json);
+                                                if (json.location && typeof json.location === 'string') {
+                                                    console.log('アップロード成功:', json.location);
+                                                    resolve(json.location); // Promise.resolve で URL を返す
+                                                } else {
+                                                    console.error('Invalid response:', json);
+                                                    reject('Invalid response: no location');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.error('Upload error:', err);
+                                                reject('Upload failed: ' + err);
+                                            });
+                                    });
+                                }
+                            });
+                        </script>
 
                         <!-- ステータス -->
                         <div class="mb-6">

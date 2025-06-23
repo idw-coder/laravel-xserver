@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
 
 // トップページのルート
@@ -51,6 +52,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 // 投稿詳細ページ（スラッグでアクセス）
 Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+
+// 画像アップロード用ルート
+Route::post('/upload-image', [ImageUploadController::class, 'store']);
 
 // 認証関連のルートを読み込み
 require __DIR__ . '/auth.php';

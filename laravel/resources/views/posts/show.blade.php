@@ -108,9 +108,8 @@
 
                     {{-- 投稿本文 --}}
                     <div class="max-w-none">
-                        {{-- 本文の表示：nl2br()で改行を<br>タグに変換 --}}
-                        <div class="text-gray-800 leading-relaxed whitespace-pre-wrap text-lg">
-                            {!! nl2br(e($post->body)) !!}
+                        <div class="p-4 bg-white rounded shadow">
+                            {!! $post->body !!}
                         </div>
                     </div>
 

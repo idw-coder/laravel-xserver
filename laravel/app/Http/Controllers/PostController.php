@@ -34,11 +34,15 @@ class PostController extends Controller
         // ページネーション付きで投稿一覧を取得
         $posts = Post::with('author')  // 作者情報も一緒に取得（Eager Loading）
             ->where(function ($query) {
-                $query->where('status', PostStatus::PUBLISHED)  // 公開済み
-                    ->orWhere(function ($q) {
+                $query->where('status', PostStatus::PUBLISHED);  // 公開済み
+
+                // 認証済みユーザーの場合のみ、自分の下書き投稿を表示
+                if (Auth::check()) {
+                    $query->orWhere(function ($q) {
                         $q->where('status', PostStatus::DRAFT)  // 下書き
                             ->where('user_id', Auth::user()->id);  // 自分の投稿のみ
                     });
+                }
             })
             ->orderBy('published_at', 'desc')  // 公開日時の降順（新しい順）
             ->paginate(10);  // 10件ずつページ分割（LengthAwarePaginatorを返す）
