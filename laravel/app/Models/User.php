@@ -99,4 +99,17 @@ class User extends Authenticatable
         // where()で条件を追加
         return $this->hasMany(Post::class)->where('status', 'published');
     }
+
+    /**
+     * admin_idでユーザーを検索する
+     * 
+     * 認証時にadmin_idを使用してユーザーを検索します。
+     * 
+     * @param string $admin_id
+     * @return static|null
+     */
+    public function findForPassport($admin_id)
+    {
+        return $this->where('admin_id', $admin_id)->first();
+    }
 }
