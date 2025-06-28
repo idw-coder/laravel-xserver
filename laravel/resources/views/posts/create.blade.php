@@ -65,6 +65,7 @@
                                 plugins: 'link image code lists',
                                 toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',
                                 height: 300,
+                                resize: true,
                                 base_url: "{{ asset('js/tinymce') }}",
                                 language: 'ja',
                                 language_url: "{{ asset('js/tinymce/ja/langs/ja.js') }}",

@@ -11,5 +11,5 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    // base: '/laravel-xserver/build/',
+    base: '/laravel-xserver/build/',
 });
