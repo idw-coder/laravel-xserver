@@ -30,6 +30,11 @@ Route::middleware('auth')->group(function () {
     // ユーザー一覧ページの表示
     Route::get('/users', [UserController::class, 'index'])->name('users');
 
+    // ユーザー作成ページの表示
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    // ユーザーの保存
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+
     // 投稿作成ページの表示
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     // 投稿の保存

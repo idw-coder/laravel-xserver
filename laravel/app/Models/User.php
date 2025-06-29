@@ -18,6 +18,29 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * 部署区分の定数定義
+     */
+    const DEPARTMENT_IT = 'it';           // 情報システム課
+    const DEPARTMENT_ACCOUNTING = 'ac';   // 経理課
+    const DEPARTMENT_SALES = 'sl';        // 成約課
+    const DEPARTMENT_HR = 'hr';           // 人事課
+    const DEPARTMENT_MARKETING = 'mk';    // マーケティング課
+
+    /**
+     * 部署区分の選択肢
+     */
+    public static function getDepartmentOptions(): array
+    {
+        return [
+            self::DEPARTMENT_IT => '情報システム課',
+            self::DEPARTMENT_ACCOUNTING => '経理課',
+            self::DEPARTMENT_SALES => '成約課',
+            self::DEPARTMENT_HR => '人事課',
+            self::DEPARTMENT_MARKETING => 'マーケティング課',
+        ];
+    }
+
+    /**
      * 一括代入可能な属性（カラム）のリスト
      * 
      * これらの属性は、create()やupdate()メソッドで一度に値を設定できます。
@@ -32,6 +55,7 @@ class User extends Authenticatable
         'admin_id',          // 管理者ID
         'qualification',     // 資格の有無
         'role',              // ユーザー権限
+        'department',        // 部署区分
     ];
 
     /**
@@ -61,6 +85,63 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',  // 文字列 → Carbon日時オブジェクト
             'password' => 'hashed',             // パスワードをハッシュ化（Laravel 10以降）
         ];
+    }
+
+    /**
+     * 部署名を取得する
+     * 
+     * @return string|null
+     */
+    public function getDepartmentNameAttribute(): ?string
+    {
+        if (!$this->department) {
+            return null;
+        }
+        return self::getDepartmentOptions()[$this->department] ?? null;
+    }
+
+    /**
+     * 部署が設定されているかチェック
+     * 
+     * @return bool
+     */
+    public function hasDepartment(): bool
+    {
+        return !is_null($this->department);
+    }
+
+    /**
+     * 特定の部署のユーザーを取得するスコープ
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $department
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByDepartment($query, string $department)
+    {
+        return $query->where('department', $department);
+    }
+
+    /**
+     * 部署が設定されているユーザーのみを取得するスコープ
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeHasDepartment($query)
+    {
+        return $query->whereNotNull('department');
+    }
+
+    /**
+     * 部署が設定されていないユーザーのみを取得するスコープ
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeNoDepartment($query)
+    {
+        return $query->whereNull('department');
     }
 
     /**
@@ -98,5 +179,35 @@ class User extends Authenticatable
     {
         // where()で条件を追加
         return $this->hasMany(Post::class)->where('status', 'published');
+    }
+
+    /**
+     * 認証に使用するカラム名を取得
+     * 
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'admin_id';
+    }
+
+    /**
+     * 認証に使用するカラムの値を取得
+     * 
+     * @return mixed
+     */
+    public function getAuthIdentifier()
+    {
+        return $this->getAttribute($this->getAuthIdentifierName());
+    }
+
+    /**
+     * 認証用のパスワードを取得
+     * 
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->password;
     }
 }
