@@ -14,11 +14,12 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">管理ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">メール</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">部署</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">資格</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">役割</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">役職</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">登録日</th>
                                 </tr>
                             </thead>
@@ -29,6 +30,22 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->admin_id ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->email }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($user->hasDepartment())
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                {{ $user->department === 'it' ? 'bg-blue-100 text-blue-800' : 
+                                                   ($user->department === 'ac' ? 'bg-green-100 text-green-800' : 
+                                                   ($user->department === 'sl' ? 'bg-yellow-100 text-yellow-800' : 
+                                                   ($user->department === 'hr' ? 'bg-purple-100 text-purple-800' : 
+                                                   ($user->department === 'mk' ? 'bg-pink-100 text-pink-800' : 'bg-gray-100 text-gray-800')))) }}">
+                                            {{ $user->department_name }}
+                                        </span>
+                                        @else
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
+                                            未設定
+                                        </span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                             {{ $user->qualification === 'qualified' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
