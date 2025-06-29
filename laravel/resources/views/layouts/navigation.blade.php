@@ -18,6 +18,15 @@
                     </x-nav-link>
                 </div>
 
+                <!-- ユーザー作成権限の確認 -->
+                @can('create-user')
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
+                        {{ __('Create User') }}
+                    </x-nav-link>
+                </div>
+                @endcan
+
                 @auth
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

@@ -12,4 +12,9 @@ class UserController extends Controller
         $users = User::orderBy('id', 'asc')->paginate(10);
         return view('users.index', compact('users'));
     }
+
+    public function create()
+    {
+        return view('auth.register');
+    }
 }
